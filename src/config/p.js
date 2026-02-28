@@ -1,7 +1,5 @@
 import * as p from '@clack/prompts';
 
-
-
 p.updateSettings({
   aliases: {
     w: 'up',

@@ -1,13 +1,13 @@
 {
   "name": "pack_checker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "pcr": "./index.js"
+    "pcr": "./src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,9 @@
   "description": "",
   "dependencies": {
     "@clack/prompts": "^1.0.1",
+    "@google/genai": "^1.43.0",
+    "archy": "^1.0.0",
+    "dotenv": "^17.3.1",
     "figlet": "^1.10.0"
   }
 }

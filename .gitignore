@@ -1,3 +1,5 @@
 .env
 node_modules/
 dist/
+index_copy.js
+project-structure.txt
