@@ -1,39 +1,67 @@
 import archy from "archy";
-import { showWelcomeScreen } from "../ui/displays.js";
-import fs from "fs";
+import fs from "fs/promises";
+import path from "path";
 
-export async function main () {
+import { IGNORED_DIRS } from "../config/constants.js";
+import { showWelcomeScreen } from "../ui/displays.js";
+
+
+export async function main() {
   console.clear();
   await showWelcomeScreen();
 
   try {
-    const structure = getCwdStructure(process.cwd());
+    const state = { fileCounter: 0 };
+
+    const structure = await getCwdStructure(process.cwd(), state);
     console.log(archy(structure));
   } catch (error) {
-    console.error("The directory could not be read. Please make sure you are in the correct directory and try again.");
+    console.error("Directory could not be read.");
     process.exit(1);
   }
 }
 
 
 
-function getCwdStructure (dirPath) {
-  const label = dirPath.split("/").pop() || dirPath;
+
+const MAX_DEPTH = 10;
+const MAX_FILES = 10000;
+
+async function getCwdStructure(dirPath, state, depth = 0) {
+  if (depth > MAX_DEPTH) return null;
+  if (state.fileCounter > MAX_FILES) return null;
+
+  const label = path.basename(dirPath);
   const structure = { label };
-  const files = fs.readdirSync(dirPath, { withFileTypes: true });
 
-  const nodes = files
-    .filter(file => !["node_modules", ".git", "dist"].includes(file.name))
-    .map(file => {
-      if (file.isFile()) {
-        return { label: file.name };
-      }
-      if (file.isDirectory()) {
-        return getCwdStructure(`${dirPath}/${file.name}`);
-      }
+  let files;
 
-      return structure;
-    });
+  try {
+    files = await fs.readdir(dirPath, { withFileTypes: true });
+  } catch {
+    return null;
+  }
+
+  const nodes = [];
+
+  for (const file of files) {
+    if (IGNORED_DIRS.includes(file.name)) continue;
+    if (file.isSymbolicLink()) continue;
+
+    const fullPath = path.join(dirPath, file.name);
+
+    if (file.isFile()) {
+      state.fileCounter++;
+      if (state.fileCounter > MAX_FILES) break;
+
+      nodes.push({ label: file.name });
+    }
+
+    if (file.isDirectory()) {
+      const child = await getCwdStructure(fullPath, state, depth + 1);
+      if (child) nodes.push(child);
+    }
+  }
 
   if (nodes.length > 0) {
     structure.nodes = nodes;
