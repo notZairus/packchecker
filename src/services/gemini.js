@@ -1,5 +1,9 @@
 import * as p from '@clack/prompts';
 import { GoogleGenAI } from "@google/genai";
+import fs from "fs";
+import path from "path";
+import os from "os";
+import { CONFIG_FILE_PATH } from "../config/constants.js";
 
 export async function promptApiKey() {
   return p.text({

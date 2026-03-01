@@ -2,12 +2,13 @@
 import fs from 'fs';
 
 import { showWelcomeScreen, showLoader } from './ui/displays.js';
-import { promptApiKey, isValidApiKey } from './services/gemini-api.js';
+import { promptApiKey, isValidApiKey } from './services/gemini.js';
 import p from "./config/p.js";
 import { hasConfigFile } from './utils/helpers.js';
 import { CONFIG_DIR_PATH, CONFIG_FILE_PATH } from './config/constants.js';
 
 async function main() {
+
 	if (! hasConfigFile()) {
 		console.clear();
 		showWelcomeScreen();
@@ -53,7 +54,8 @@ async function start() {
 	switch (action) {
 		case 'analyze': {
 			const analyze = await import('./commands/analyze.js');
-			analyze.main();
+			analyze.start();
+			break;
 		}
 		default: {
 			p.outro('Action not implemented yet. Please select a valid action.');
